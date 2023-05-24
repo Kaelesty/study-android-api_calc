@@ -10,6 +10,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -87,5 +90,14 @@ public class MainActivity extends AppCompatActivity {
         Expression expression = new ExpressionBuilder(exp).build();
         double result = expression.evaluate();
         return Double.toString(result);
+    }
+
+    protected String apiEvaluale(String exp) throws IOException {
+        String result = "";
+        URL url = new URL("http://example.com");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("GET");
+
+        return result;
     }
 }
