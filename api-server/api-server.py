@@ -4,7 +4,10 @@ app = Flask(__name__)
 
 @app.route("/evaluate/<expression>")
 def evaluate(expression):
-	return str(eval(expression))
+	try:
+		return str(eval(expression))
+	except SyntaxError:
+		return "Invalid expression"
 
 
 if __name__ == "__main__":
