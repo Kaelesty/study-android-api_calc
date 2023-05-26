@@ -11,4 +11,7 @@ def evaluate(expression):
 
 
 if __name__ == "__main__":
+	import os
+	os.startfile("translator.exe")
+	# domain - https://kaelesty-api-calc.loca.lt
 	app.run(port=8000)
