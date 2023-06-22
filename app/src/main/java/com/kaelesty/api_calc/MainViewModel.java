@@ -37,6 +37,11 @@ public class MainViewModel extends AndroidViewModel {
                     public void accept(EvaluationResult evaluationResult) throws Throwable {
                         evaluationResultLD.postValue(evaluationResult);
                     }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Throwable {
+                        evaluationResultLD.postValue(new EvaluationResult("error", "Network Error"));
+                    }
                 });
     }
 
