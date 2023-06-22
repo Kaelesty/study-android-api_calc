@@ -6,27 +6,25 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
-import net.objecthunter.exp4j.Expression;
-import net.objecthunter.exp4j.ExpressionBuilder;
-
-import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
 
 public class MainActivity extends AppCompatActivity {
 
-    TextView textView;
-    Button evalButton;
+    private TextView textView;
+    private Button evalButton;
+    private MainViewModel viewModel;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        viewModel = new ViewModelProvider(this).get(MainViewModel.class);
 
         Map<Integer, String> dict = new HashMap<Integer, String>();
         dict.put(R.id.num_0, "0");
@@ -84,31 +82,16 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         }
+
+        viewModel.getEvaluationResult().observe(this, new Observer<EvaluationResult>() {
+            @Override
+            public void onChanged(EvaluationResult evaluationResult) {
+                textView.setText(evaluationResult.getContent());
+            }
+        });
     }
 
     protected void evalButtonPressed() throws IOException {
-        String expression = textView.getText().toString();
-        String result = apiEvaluate(expression);
-        textView.setText(result);
-    }
-
-    protected String localEvaluate(String exp) {
-        Expression expression = new ExpressionBuilder(exp).build();
-        double result = expression.evaluate();
-        return Double.toString(result);
-    }
-
-    protected String apiEvaluate(String exp) throws IOException {
-        String result = "";
-        URL api = new URL("https://kaelesty-api-calc.loca.lt/evaluate/" + exp);
-        HttpURLConnection urlConnection = (HttpURLConnection) api.openConnection();
-        try {
-            InputStream in = new BufferedInputStream(urlConnection.getInputStream());
-            result = String.valueOf(in.read());
-        }
-        finally {
-            urlConnection.disconnect();
-        }
-        return result;
+        viewModel.evaluate(textView.getText().toString());
     }
 }
