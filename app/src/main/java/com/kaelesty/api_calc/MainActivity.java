@@ -10,7 +10,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
@@ -49,7 +51,11 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.btn_eval).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                evalButtonPressed();
+                try {
+                    evalButtonPressed();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
         findViewById(R.id.btn_clear).setOnClickListener(new View.OnClickListener() {
@@ -80,9 +86,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    protected void evalButtonPressed() {
+    protected void evalButtonPressed() throws IOException {
         String expression = textView.getText().toString();
-        String result = localEvaluate(expression);
+        String result = apiEvaluate(expression);
         textView.setText(result);
     }
 
@@ -92,12 +98,17 @@ public class MainActivity extends AppCompatActivity {
         return Double.toString(result);
     }
 
-    protected String apiEvaluale(String exp) throws IOException {
+    protected String apiEvaluate(String exp) throws IOException {
         String result = "";
-        URL url = new URL("http://example.com");
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
-        con.setRequestMethod("GET");
-
+        URL api = new URL("https://kaelesty-api-calc.loca.lt/evaluate/" + exp);
+        HttpURLConnection urlConnection = (HttpURLConnection) api.openConnection();
+        try {
+            InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+            result = String.valueOf(in.read());
+        }
+        finally {
+            urlConnection.disconnect();
+        }
         return result;
     }
 }
